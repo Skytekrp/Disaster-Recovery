@@ -19,7 +19,7 @@ jobs:
     environment: tfplan   # this environment may have no approval, so plan runs automatically
     defaults:
       run:
-        working-directory: ./   # adjust to your Terraform folder
+        working-directory: ./   # adjust to your Terraform folder current
 
     steps:
       - name: Checkout
