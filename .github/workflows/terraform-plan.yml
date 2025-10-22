@@ -28,9 +28,9 @@ jobs:
       - name: Login to Azure via OIDC
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ vars.SPN_APP_ID }}  
+          tenant-id: ${{ vars.TENANT_ID }}
+          subscription-id: ${{ vars.SUBSCRIPTION_ID }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -42,18 +42,18 @@ jobs:
         run: terraform init
         env:
           ARM_USE_OIDC: true
-          ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-          ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          ARM_CLIENT_ID: ${{ vars.SPN_APP_ID }}
+          ARM_TENANT_ID: ${{ vars.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
 
       - name: Terraform Plan
         id: tfplan
         run: terraform plan -out=tfplan
         env:
           ARM_USE_OIDC: true
-          ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-          ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          ARM_CLIENT_ID: ${{ vars.SPN_APP_ID }}
+          ARM_TENANT_ID: ${{ vars.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
 
       - name: Upload plan artifact
         uses: actions/upload-artifact@v4
