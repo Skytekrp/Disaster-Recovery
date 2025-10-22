@@ -16,7 +16,7 @@ jobs:
   plan:
     name: Plan
     runs-on: ubuntu-latest
-    environment: tfplan   # this environment may have no approval, so plan runs automatically
+    environment: dev   # this environment may have no approval, so plan runs automatically
     defaults:
       run:
         working-directory: ./   # adjust to your Terraform folder current
