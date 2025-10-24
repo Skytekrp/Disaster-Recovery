@@ -12,14 +12,15 @@ permissions:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Azure login via OIDC
+      - name: Login to Azure via OIDC
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.SPN_APP_ID }}
+          client-id: ${{ vars.SPN_APP_ID }}  
           tenant-id: ${{ vars.TENANT_ID }}
           subscription-id: ${{ vars.SUBSCRIPTION_ID }}
 
