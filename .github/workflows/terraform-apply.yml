@@ -45,9 +45,15 @@ jobs:
         working-directory: ./
         env:
           ARM_USE_OIDC: true
+          ARM_CLIENT_ID: ${{ vars.SPN_APP_ID }}
+          ARM_TENANT_ID: ${{ vars.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: ./
         env:
           ARM_USE_OIDC: true
+          ARM_CLIENT_ID: ${{ vars.SPN_APP_ID }}
+          ARM_TENANT_ID: ${{ vars.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
