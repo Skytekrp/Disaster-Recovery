@@ -32,10 +32,13 @@ jobs:
           terraform_version: "1.8.0"   # or your version
 
       - name: Terraform Init
+        id: init
         run: terraform init
-        working-directory: ./   # adjust if your Terraform code is in subfolder
         env:
           ARM_USE_OIDC: true
+          ARM_CLIENT_ID: ${{ vars.SPN_APP_ID }}
+          ARM_TENANT_ID: ${{ vars.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
