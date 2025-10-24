@@ -2,7 +2,7 @@ name: Terraform Deploy
 
 on:
   workflow_run:
-    workflows: ["terraform-plan"]
+    workflows: ["Terraform Plan"]
     types:
       - completed
    
