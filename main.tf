@@ -5,7 +5,6 @@ terraform {
       version = ">= 3.0.0"
     }
   }
-
   required_version = ">= 1.3.0"
 }
 
@@ -43,7 +42,7 @@ resource "azurerm_subnet" "back" {
   address_prefixes     = [var.subnet_back_prefix]
 }
 
-# Network Security Group (allow SSH from anywhere to the VM)
+# Network Security Group
 resource "azurerm_network_security_group" "nsg" {
   name                = "${var.vm_name}-nsg"
   location            = azurerm_resource_group.rg.location
@@ -62,7 +61,16 @@ resource "azurerm_network_security_group" "nsg" {
   }
 }
 
-# Network Interface for VM
+# Public IP
+resource "azurerm_public_ip" "publicip" {
+  name                = "${var.vm_name}-pip"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+# Network Interface with public IP
 resource "azurerm_network_interface" "nic" {
   name                = "${var.vm_name}-nic"
   location            = azurerm_resource_group.rg.location
@@ -72,44 +80,15 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = azurerm_subnet.front.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.publicip.id
   }
-
 }
 
+# Associate NSG to NIC
 resource "azurerm_network_interface_security_group_association" "nic_nsg_assoc" {
   network_interface_id      = azurerm_network_interface.nic.id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
-
-# Public IP
-resource "azurerm_public_ip" "publicip" {
-  name                = "${var.vm_name}-pip"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Static"
-}
-
-# Attach public IP to NIC
-resource "azurerm_network_interface" "nic_with_public" {
-  # This is an alternate pattern – simpler: embed the public_ip in the NIC's ip_configuration
-  # But for clarity using separate resource:
-  name                = azurerm_network_interface.nic.name
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  ip_configuration {
-    name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.front.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.publicip.id
-  }
-
- 
-
-  # We import the original NIC for consistency
-  depends_on = [ azurerm_network_interface.nic ]
-}
-
 
 # Ubuntu Virtual Machine
 resource "azurerm_linux_virtual_machine" "vm" {
@@ -117,15 +96,16 @@ resource "azurerm_linux_virtual_machine" "vm" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   network_interface_ids = [
-    azurerm_network_interface.nic_with_public.id
+    azurerm_network_interface.nic.id
   ]
   size                = var.vm_size
   admin_username      = var.vm_admin_username
   admin_password      = var.vm_admin_password
-  disable_password_authentication = false  # in production use SSH key
+  disable_password_authentication = false
+
   os_disk {
-    name              = "${var.vm_name}-osdisk"
-    caching           = "ReadWrite"
+    name                 = "${var.vm_name}-osdisk"
+    caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
@@ -135,12 +115,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
     sku       = "22.04-LTS"
     version   = "latest"
   }
-
-  # Optional: custom_data / cloud_init
-  # custom_data = filebase64("cloud-init.txt")
 }
 
-# Output VM public IP
+# Output public IP
 output "vm_public_ip" {
   description = "Static Public IP of the Ubuntu VM"
   value       = azurerm_public_ip.publicip.ip_address
