@@ -43,7 +43,7 @@ variable "subnet_back_name" {
 variable "subnet_back_prefix" {
   description = "Address prefix for back subnet"
   type        = string
-  default     = "192.168.1.192/25"
+  default     = "192.168.1.128/25"
 }
 
 variable "vm_name" {
