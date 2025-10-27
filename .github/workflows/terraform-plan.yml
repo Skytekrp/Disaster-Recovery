@@ -1,9 +1,6 @@
 name: Terraform Plan
 
 on:
-  push:
-    branches:
-      - main   # or your branch you treat as “env”
   pull_request:
     branches:
       - main
