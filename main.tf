@@ -142,6 +142,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
 # Output VM public IP
 output "vm_public_ip" {
-  description = "Public IP of the Ubuntu VM"
+  description = "Static Public IP of the Ubuntu VM"
   value       = azurerm_public_ip.publicip.ip_address
 }
